@@ -1,0 +1,10 @@
+svg = append svg#graphics
+
+pod_arc = svg
+xs = svg
+pie = svg
+
+svg select .arc
+	data pie(xs)
+append g.arc
+	@d=pod_arc

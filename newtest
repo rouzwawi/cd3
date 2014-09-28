@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then exit 1; fi
+
+touch tests/$1.test tests/$1.test.exp

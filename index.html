@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        text-align: center;
+      }
+
+      .arc text {
+        fill: #FFFFFF;
+      }
+
+      .arc-site path {
+        stroke: white;
+        stroke-width: 1px;
+        fill: #81b71a;
+      }
+
+      .arc-pod path {
+        stroke: white;
+        stroke-width: 1px;
+        fill: #0993C7;
+      }
+
+      .pod-circle circle {
+        stroke: #0993C7;
+        stroke-width: 1px;
+        fill: none;
+      }
+    </style>
+
+    <script>
+      function init() {
+        var links_data = {
+          matrix: [[0, 1, 0, 0, 0, 0, 0],
+                   [0, 1, 0, 0, 0, 0, 0],
+                   [0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 0, 0, 0, 1]]
+        };
+
+        var width = 1000,
+            height = 800,
+            radius = Math.min(width, height) / 2;
+
+        var sites = [
+          {
+            name: 'lon',
+            pods: ['lon2', 'lon3'],
+          },
+          {
+            name: 'sto',
+            pods: ['sto1', 'sto3'],
+          },
+          {
+            name: 'aws',
+            pods: ['awsue4', 'awsuse1'],
+          },
+          {
+            name: 'sjc',
+            pods: ['sjc1'],
+          },
+          {
+            name: 'ash',
+            pods: ['ash1', 'ash2'],
+          },
+        ];
+
+        var hosts = {
+          'ash1': ['ash1-host-a1', 'ash1-host-a3', 'ash1-host-a2'],
+          'lon3': ['lon3-host-a1', 'lon3-host-a3', 'lon3-host-a2'],
+          'sjc1': ['sjc1-host-a1', 'sjc1-host-a3', 'sjc1-host-a2'],
+        };
+
+        var pod_angles = function(d) { // site arc
+          var pod_padding = 0.03;
+
+          var pods_pie = d3.layout.pie()
+            .sort(null)
+            .value(function(_d) { return 1; })
+            .startAngle(d.startAngle + pod_padding)
+            .endAngle(d.endAngle - pod_padding);
+
+          var pods = [];
+          for (var i = 0; i < d.data.pods.length; i++) {
+            var pod_name = d.data.pods[i];
+            pods.push({
+              name: pod_name,
+              hosts: hosts[pod_name],
+            });
+          }
+          return pods_pie(pods);
+        };
+
+        var pie = d3.layout.pie()
+          .sort(null)
+          .value(function(d) { return d.pods.length; });
+
+
+        var svg = d3.select('.container')
+          .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+          .append('g')
+            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+
+        var site_arc = d3.svg.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(radius - 40);
+
+        var pod_arc = d3.svg.arc()
+          .outerRadius(radius - 95)
+          .innerRadius(radius - 135);
+
+        // var legacy_arc = d3.svg.arc()
+        //   .outerRadius(radius - 30)
+        //   .innerRadius(radius - 45);
+
+        var site_arc_element = svg.selectAll('.arc')
+          .data(pie(sites))
+          .enter()
+            .append('g')
+            .attr('class', 'arc');
+
+        site_arc_element.append('g')
+          .attr('class', 'arc-site')
+          .append('path')
+            .attr('id', function(d) { return d.data.name; })
+            .attr('d', site_arc);
+
+        site_arc_element.append('text')
+          .attr('dy', '1.55em')
+          .attr('dx', '1.7em')
+          
+          .style('font-size', '0.8em')
+          .append('textPath')
+            .attr('xlink:href', function(d) { return '#' + d.data.name; })
+            .text(function(d) { return d.data.name.toUpperCase(); });
+
+
+        var pod_arc_element = site_arc_element.selectAll('.arc-pod')
+          .data(pod_angles)
+          .enter()
+            .append('g')
+            .attr('class', 'arc-pod');
+
+        pod_arc_element
+          .append('path')
+            .attr('id', function(d) { return d.data.name; })
+            .attr('d', pod_arc)
+            .style('fill', function(d) { return d.data.hosts ? '#0993C7' : '#AFAFAF' });
+
+        pod_arc_element.append('text')
+          .attr('dy', '1.9em')
+          .attr('dx', '1.7em')
+          .style('font-size', '0.8em')
+          .append('textPath')
+            .attr('xlink:href', function(d) { return '#' + d.data.name; })
+            .text(function(d) { return d.data.name + ' : ' + (d.data.hosts || []).length + ' hosts'; });
+
+        site_arc_element.selectAll('.pod-circle')
+          .data(pod_angles)
+          .enter()
+            .append('g')
+            .attr('class', 'pod-circle')
+              .append('circle')
+              .attr('cx', function(d) { return pod_arc.centroid(d)[0]*0.85 })
+              .attr('cy', function(d) { return pod_arc.centroid(d)[1]*0.85 })
+              .attr('r', 5);
+
+        function fade(opacity) {
+          return function(g, i) {
+            svg.selectAll(".arc-pod path")
+                .filter(function(d) { return d.index != i; })
+              .transition()
+                .style("opacity", opacity);
+          };
+        }
+      };
+
+      window.onload = init;
+    </script>
+
+  </head>
+  <body>
+    <div class="container">
+    </div>
+  </body>
+</html>
