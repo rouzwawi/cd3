@@ -1,17 +1,6 @@
 /*
-  eval(vexpr)
-
-  'vexpr' contains "_d" or "_i"
-    => function(_d, _i) { return `eval(vexpr)` }
-
-  'vexpr' exists in env or match '(*)'
-    => `vexpr`
-  :example
-    env: foo = 'hello'
-    foo => foo
-  :
-    ('#' + _d.data.name) => ('#' + _d.data.name)
-*/
+ * Grammar for CD3
+ */
 
 {
   var env = {};
@@ -56,8 +45,9 @@ expr_
   // invoke
   // ref
   / num
+  / selectAll
   / select
-  // data
+  / data
   // append
   // enter
   / $('_' '_' '_')
@@ -83,6 +73,10 @@ ref
 
 select
   = 'select' space elem:$elems
+    { return 'd3.select("' + elem + '")' }
+
+selectAll
+  = 'selectAll' space elem:$elems
     { return 'd3.selectAll("' + elem + '")' }
 
 data
