@@ -2,5 +2,6 @@ CD3 - Concise D3
 ================
 
 ```sh
-$ ./test.sh
+$ npm install
+$ ./test
 ```

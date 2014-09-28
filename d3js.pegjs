@@ -56,10 +56,10 @@ expr_
   // invoke
   // ref
   / num
+  / select
   // data
-  // enter
-  // select
   // append
+  // enter
   / $('_' '_' '_')
 
 assign
@@ -81,6 +81,10 @@ ref
 
 // d3 expressions
 
+select
+  = 'select' space elem:$elems
+    { return 'd3.selectAll("' + elem + '")' }
+
 data
   = 'data' space ref:(invoke / ref)
     { return '\t.data(' + ref + ')' }
@@ -88,10 +92,6 @@ data
 enter
   = 'enter'
     { return '.enter()' }
-
-select
-  = 'select' space elem:$elems
-    { return '.selectAll("' + elem + '")' }
 
 append
   = 'append' space elem:elems
