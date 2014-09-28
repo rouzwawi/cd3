@@ -1,0 +1,9 @@
+{
+  "name": "cd3",
+    "description": "Concise D3",
+    "version": "0.0.1",
+    "repository": "https://github.com/rouzwawi/cd3",
+    "dependencies": {
+      "pegjs": "*"
+    }
+}
