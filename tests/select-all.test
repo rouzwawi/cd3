@@ -1,1 +1,1 @@
-foo = selectAll p
+foo = d3 selectAll p

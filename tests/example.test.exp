@@ -1,0 +1,5 @@
+var foo,lis,ul;
+foo = 1
+ul = d3.select("ul")
+lis = ul.selectAll("li")
+	.data(foo)

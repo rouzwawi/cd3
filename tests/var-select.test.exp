@@ -1,0 +1,3 @@
+var bar,foo;
+foo = d3.select("p")
+bar = foo.selectAll("span")

@@ -1,4 +1,0 @@
-var bar,foo;
-foo = 1
-bar = d3.select("li")
-	.data(foo)

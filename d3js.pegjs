@@ -3,7 +3,7 @@
  */
 
 {
-  var env = {};
+  var env = {'d3':true};
 
   function funcify(code) {
     if (typeof(code) == 'boolean')
@@ -21,12 +21,12 @@ start
   =  space program:expr*
   {
     var vars = [];
-    for (var name in env) vars.push(name);
+    for (var name in env) if (name != 'd3') vars.push(name);
     vars.sort();
 
     var p = '';
     if (vars.length) p += 'var ' + vars.join(',') + ';\n';
-    p += program.filter(Boolean).join('\n');
+    p += program.filter(Boolean).join('\n') + '\n';
 
     return p;
   }
@@ -43,12 +43,12 @@ expr
 expr_
   = assign
   // invoke
-  // ref
+  / ref
   / num
   / selectAll
   / select
   / data
-  // append
+  / append
   // enter
   / $('_' '_' '_')
 
@@ -60,24 +60,24 @@ assign
   }
 
 invoke
-  = id:ref space '(' space arg:expr space ')'
-    { return id + '(' + arg + ')' }
+  = id:ref space '(' space arg:expr space ')' space e:expr?
+    { return id + '(' + arg + ')' + (e || '') }
 
 ref
-  = id:id
+  = id:id space e:expr?
   & { return env[id] } // must reference declared name
-    { return id }
+    { return id + (e || '') }
 
 
 // d3 expressions
 
 select
   = 'select' space elem:$elems
-    { return 'd3.select("' + elem + '")' }
+    { return '.select("' + elem + '")' }
 
 selectAll
   = 'selectAll' space elem:$elems
-    { return 'd3.selectAll("' + elem + '")' }
+    { return '.selectAll("' + elem + '")' }
 
 data
   = 'data' space ref:(invoke / ref)
@@ -85,7 +85,7 @@ data
 
 enter
   = 'enter'
-    { return '.enter()' }
+    { return '.enter()\n' }
 
 append
   = 'append' space elem:elems
