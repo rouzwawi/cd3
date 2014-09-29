@@ -7,8 +7,7 @@ fs.readFile(process.argv[2], 'utf8', function (err, data) {
         return console.log(err);
     }
 
-    var parser = PEG
-        .buildParser(data);
+    var parser = PEG.buildParser(data);
 
     process.stdin.setEncoding('utf8');
 

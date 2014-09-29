@@ -7,7 +7,7 @@ $ ./test
 ```
 
 ```sh
-$ cd3 <<EOF
+$ ./cd3 <<EOF
 x = 200
 d3 selectAll input
 append input#email.big.focus@color=blue@width=x@enabled
