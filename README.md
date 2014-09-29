@@ -7,7 +7,11 @@ $ ./test
 ```
 
 ```sh
-$ cd3 <<<'x = 200; d3 selectAll input append input#email.big.focus@color=blue@width=x@enabled'
+$ cd3 <<EOF
+x = 200
+d3 selectAll input
+append input#email.big.focus@color=blue@width=x@enabled
+EOF
 var x;
 x = 200
 d3.selectAll("input")
